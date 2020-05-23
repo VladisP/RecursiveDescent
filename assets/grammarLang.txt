@@ -1,0 +1,12 @@
+RULES -> 'repeat
+            "N" "->" BODY "'end"
+         'end
+     'end
+BODY -> ATOM 'repeat ATOM 'end
+        'repeat "'or" BODY 'end
+        'end
+ATOM -> "T" 'or
+        "N" 'or
+        "(" BODY ")" 'or
+        "'repeat" BODY "'end"
+        'end

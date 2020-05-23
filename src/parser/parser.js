@@ -21,6 +21,14 @@ export class Parser {
         return this.current.domain === Domains.EOF ? [] : this.Rules();
     }
 
+    bodyToAtom(body) {
+        return new Atom({
+            type: Types.ALT,
+            value: body.map(concat => new Atom({type: Types.CONCAT, value: concat}))
+        });
+    }
+
+    //Rules ::= (N -> Body 'end)*
     Rules() {
         this.expect([Domains.NONTERMINAL]);
 
@@ -31,7 +39,7 @@ export class Parser {
             this.next();
             this.expect([Domains.ARROW]);
             this.next();
-            const to = this.Body();
+            const to = this.bodyToAtom(this.Body());
             this.expect([Domains.END]);
             this.next();
             rules.push(new Rule({from, to}));
@@ -40,6 +48,7 @@ export class Parser {
         return rules;
     }
 
+    //Body ::= Atom+ ('or Body)*
     Body() {
         const body = [];
         const atoms = [];
@@ -58,6 +67,7 @@ export class Parser {
         return body;
     }
 
+    //Atom ::= T | N | (Body) | 'repeat Body 'end
     Atom() {
         let value = null;
 
@@ -72,13 +82,13 @@ export class Parser {
                 return new Atom({type: Types.NONTERMINAL, value});
             case Domains.LPAREN:
                 this.next();
-                value = this.Body();
+                const atom = this.bodyToAtom(this.Body());
                 this.expect([Domains.RPAREN]);
                 this.next();
-                return new Atom({type: Types.GROUP, value});
+                return atom;
             case Domains.REPEAT:
                 this.next();
-                value = this.Body();
+                value = this.bodyToAtom(this.Body());
                 this.expect([Domains.END]);
                 this.next();
                 return new Atom({type: Types.REPEAT, value});
