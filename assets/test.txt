@@ -1,0 +1,4 @@
+E -> T  'repeat
+            ("+" 'or "-") T
+        'end
+     'end
