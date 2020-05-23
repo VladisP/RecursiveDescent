@@ -1,6 +1,6 @@
 import fs from 'fs';
 import {Lexer} from './src/lexer/lexer.js';
-import {Domains} from './src/lexer/domains.js';
+import {Parser} from './src/parser/parser.js';
 
 const args = process.argv.slice(2);
 
@@ -9,14 +9,14 @@ if (args.length === 0) {
     process.exit(-1);
 }
 
-const program = fs.readFileSync(args[0]).toString();
-console.log(program);
-console.log();
+try {
+    const program = fs.readFileSync(args[0]).toString();
+    const lexer = new Lexer(program);
+    const parser = new Parser(lexer);
 
-const lexer = new Lexer(program);
-let token;
-
-do {
-    token = lexer.nextToken();
-    console.log(token.toString());
-} while (token.domain !== Domains.EOF);
+    fs.rmdirSync('./output', {recursive: true});
+    fs.mkdirSync('./output');
+    fs.writeFileSync('./output/rules.json', JSON.stringify(parser.parse(), null, 2));
+} catch (e) {
+    console.error(e);
+}

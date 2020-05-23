@@ -2,3 +2,10 @@ E -> T  'repeat
             ("+" 'or "-") T
         'end
      'end
+T -> F  'repeat
+            ("*" 'or "/") F
+        'end
+     'end
+F -> "n" 'or
+     "-" F 'or
+     "(" E ")" 'end

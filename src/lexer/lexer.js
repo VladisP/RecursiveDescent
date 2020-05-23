@@ -1,5 +1,5 @@
 import {Token} from './token.js';
-import {Domains} from './domains.js';
+import {Domains} from '../helpers/constants.js';
 
 export class Lexer {
     constructor(program) {
